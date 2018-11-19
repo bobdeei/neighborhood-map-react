@@ -1,10 +1,12 @@
 # Introduction
 
-This is the last project, 7/7, in GwG FEND scholarship.
+This is the last project out of 7 ones in GwG FEND scholarship program.
 
 # Instruction
 
-Download or clone the repo
+Download or clone the repo with:
+
+> `git clone https://github.com/bobdeei/neighborhood-map-react.git`
 
 Run `npm i` to install dependencies.
 Run `npm start` to start a local server.
