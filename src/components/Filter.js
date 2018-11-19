@@ -2,13 +2,14 @@ import React, { Component } from "react";
 
 class Filter extends Component {
   state = {
-    query: ""
+    query: "",
+    filterMarkers: []
   };
 
   componentWillMount() {
     setTimeout(() => {
       this.setState({
-        markers: this.props.markers
+        filterMarkers: this.props.markers
       });
     }, 1000);
   }
@@ -22,8 +23,9 @@ class Filter extends Component {
     this.props.infoWindow.close();
   };
 
-  filterMarker = e => {
+  filterMarkers = e => {
     const { markers, infoWindow } = this.props;
+    const filterMarkers = [];
     const query = e.target.value.toLowerCase();
     this.setState({
       query: query
@@ -33,14 +35,24 @@ class Filter extends Component {
       infoWindow.close();
       // Display only matched marker
       markers.forEach(marker => {
-        marker.title.toLowerCase().includes(query)
-          ? marker.setVisible(true)
-          : marker.setVisible(false);
+        if (marker.title.toLowerCase().includes(query)) {
+          marker.setVisible(true);
+          filterMarkers.push(marker);
+        } else {
+          marker.setVisible(false);
+        }
+      });
+
+      this.setState({
+        filterMarkers: filterMarkers
       });
     } else {
       // If there's no query then display all markers
       markers.forEach(marker => {
         marker.setVisible(true);
+      });
+      this.setState({
+        filterMarkers: markers
       });
     }
   };
@@ -68,8 +80,8 @@ class Filter extends Component {
   };
 
   render() {
-    const { query } = this.state;
-    const { markerIcon, markers } = this.props;
+    const { query, filterMarkers } = this.state;
+    const { markerIcon } = this.props;
     return (
       <div className="container-filter">
         <i
@@ -83,12 +95,12 @@ class Filter extends Component {
           <input
             type="text"
             placeholder="Search..."
-            onChange={this.filterMarker}
+            onChange={this.filterMarkers}
             aria-labelledby="filter"
             value={query}
           />
-          <ul className="filter-list">
-            {markers.map(marker => (
+          <ul className="filter-list" role="list" tabIndex="0">
+            {filterMarkers.map(marker => (
               <li
                 key={marker.id}
                 onClick={() => this.openInfoWindow(marker)}
