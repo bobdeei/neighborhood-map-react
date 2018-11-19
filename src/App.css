@@ -22,6 +22,12 @@ body {
   padding: 0;
 }
 
+#error {
+  text-align: center;
+  font-size: 2em;
+  margin: auto;
+}
+
 .container-filter {
   background: var(--header-color);
   color: var(--title-color);

@@ -4,7 +4,8 @@ import "./App.css";
 import {
   GOOGLE_MAP_API_KEY,
   FS_CLIENT_ID,
-  FS_CLIENT_SECRET
+  FS_CLIENT_SECRET,
+  FS_V
 } from "./data/auth";
 import axios from "axios";
 
@@ -16,7 +17,8 @@ class App extends Component {
     map: {},
     venues: [],
     markers: [],
-    infoWindow: {}
+    infoWindow: {},
+    error: false
   };
 
   componentDidMount() {
@@ -38,7 +40,7 @@ class App extends Component {
       client_secret: FS_CLIENT_SECRET,
       query: "food",
       near: "cincinnati",
-      v: "20180323"
+      v: FS_V
     };
     axios
       .get(endPoint + new URLSearchParams(params))
@@ -46,13 +48,19 @@ class App extends Component {
         this.setState(
           {
             // Store only first 20 out of 30 venues
-            venues: res.data.response.groups[0].items.slice(0, 20)
+            venues: res.data.response.groups[0].items.slice(0, 20),
+            error: false
           },
           // After that, call renderMap as a callback
           this.renderMap
         )
       )
-      .catch(err => console.log("Error: " + err));
+      .catch(err => {
+        this.setState({
+          error: true
+        });
+        console.log("Error: " + err);
+      });
   };
 
   initMap = () => {
@@ -145,16 +153,22 @@ class App extends Component {
   };
 
   render() {
-    const { map, markers, infoWindow } = this.state;
+    const { map, markers, infoWindow, error } = this.state;
     return (
       <main>
-        <Filter
-          map={map}
-          markers={markers}
-          infoWindow={infoWindow}
-          markerIcon={this.markerIcon}
-        />
-        <Map />
+        {error ? (
+          <div id="error">Failed loading data... Please try again!</div>
+        ) : (
+          <React.Fragment>
+            <Filter
+              map={map}
+              markers={markers}
+              infoWindow={infoWindow}
+              markerIcon={this.markerIcon}
+            />
+            <Map />
+          </React.Fragment>
+        )}
       </main>
     );
   }
@@ -167,6 +181,11 @@ function loadScript(url) {
   script.async = true;
   script.defer = true;
   index.parentNode.insertBefore(script, index);
+
+  script.onerror = () => {
+    document.querySelector("#root").innerHTML =
+      "Error has occurred. Failed to load data. Please try again!";
+  };
 }
 
 export default App;
